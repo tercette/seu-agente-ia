@@ -51,7 +51,17 @@ export async function POST(req: NextRequest) {
       from: process.env.EMAIL_USER,
       to: user.email,
       subject: "Recuperação de Senha",
-      text: `Clique no link abaixo para redefinir sua senha: ${resetLink}`,
+      html: `
+    <h2>Recuperação de Senha</h2>
+    <p>Olá ${user.name},</p>
+    <p>Recebemos uma solicitação de recuperação de senha. Para redefinir sua senha, clique no link abaixo:</p>
+    <p style="text-align: center;">
+      <a href="${resetLink}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Redefinir Senha</a>
+    </p>
+    <p>Este link será válido por 1 hora.</p>
+    <p>Se você não fez essa solicitação, por favor, ignore este email.</p>
+    <p>Atenciosamente,<br>Equipe</p>
+  `,
     };
 
     await transporter.sendMail(mailOptions);
