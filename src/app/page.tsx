@@ -47,7 +47,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white px-4 py-4">
-      <header className="text-center mb-16">
+      <header className="text-center mb-10">
         <h1 className="text-4xl md:text-5xl font-extrabold">
           Crie seu Agente de IA Personalizado
         </h1>
@@ -59,7 +59,7 @@ export default function Home() {
         </Button>
       </header>
 
-      <section className="max-w-6xl mx-auto mb-16">
+      <section className="max-w-6xl mx-auto mb-10">
         <div className="bg-slate-800 rounded-3xl p-6 shadow-xl">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-10 text-center">
             Como Funciona?
