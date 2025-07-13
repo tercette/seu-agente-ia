@@ -54,7 +54,7 @@ export default function Home() {
         <p className="text-lg md:text-xl text-slate-300 mt-4 max-w-2xl mx-auto">
           Automatize atendimentos, agendamentos e dúvidas com um agente inteligente treinado para o seu negócio.
         </p>
-        <Button variant={'default'} onClick={() => router.push('/avaliacao')} className="mt-8 transition-all duration-200 hover:scale-105 hover:shadow-lg">
+        <Button size={'lg'} variant={'default'} onClick={() => router.push('/avaliacao')} className="mt-8 transition-all duration-200 hover:scale-105 hover:shadow-lg">
           Quero minha avaliação gratuita
         </Button>
       </header>
