@@ -9,6 +9,6 @@ export async function connectMongo() {
   }
 
   return mongoose.connect(MONGODB_URI, {
-    dbName: 'seu-agente-ia', // ou o nome do banco
+    dbName: 'seu-agente-ia',
   })
 }
