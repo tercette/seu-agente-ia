@@ -50,7 +50,7 @@ export default function DashboardLista() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white px-6 py-10">
       <h1 className="text-4xl font-extrabold mb-8 text-center">
-        Olá, {userName}! Seus agentes
+        Olá, {userName}! Confira suas avaliações e configure o seu agente.
       </h1>
 
       <div className="mb-8 flex justify-center">

@@ -86,6 +86,15 @@ export default function AvaliacaoPage() {
         Responda rapidamente algumas perguntas para criarmos um agente personalizado para você.
       </p>
 
+      <div className="mb-8 flex justify-center">
+        <button
+          onClick={() => router.push('/')}
+          className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded"
+        >
+          Voltar para Home
+        </button>
+      </div>
+
       <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-xl bg-slate-700 p-6 rounded-lg shadow-lg">
         <div className="mb-4">
           <label className="block text-sm font-semibold mb-1">Nome do Negócio</label>

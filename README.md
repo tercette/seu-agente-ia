@@ -35,7 +35,13 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+## to run ngrok =>   ngrok http 3000
 
+## apos a conexao com o ngrok, gerar um novo token atualizar a url do ngrok aqui: https://2f455dabbb97.ngrok-free.app/api/whatsapp/webhook
+
+## acessar https://developers.facebook.com/apps/2377734792623250/whatsapp-business/wa-dev-console/?business_id=3579894848720863
+
+## e atualizar https://2f455dabbb97.ngrok-free.app/api/whatsapp/webhook
 
 ## todo
 

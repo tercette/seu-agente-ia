@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const storedToken = localStorage.getItem('accessToken');
         if (!storedToken) {
-          if (!publicRoutes.includes(pathname)) {
+          if (!publicRoutes.includes(pathname ?? '')) {
             router.push('/login');
           }
           return;
@@ -57,13 +57,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setAgentId(data.agentId);
           setUserName(data.userName)
         } else {
-          if (!publicRoutes.includes(pathname)) {
+          if (!publicRoutes.includes(pathname ?? '')) {
             router.push('/login');
           }
         }
       } catch (error) {
         console.error('Erro ao validar o token inicial:', error);
-        if (!publicRoutes.includes(pathname)) {
+        if (!publicRoutes.includes(pathname ?? '')) {
           router.push('/login');
         }
       }
@@ -90,14 +90,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setAccessToken(data.accessToken);
             localStorage.setItem('accessToken', data.accessToken);
           } else if (res.status === 401) {
-            if (!publicRoutes.includes(pathname)) {
+            if (!publicRoutes.includes(pathname ?? '')) {
               router.push('/login');
             }
           }
         }
       } catch (error) {
         console.error('Erro ao renovar o token:', error);
-        if (!publicRoutes.includes(pathname)) {
+        if (!publicRoutes.includes(pathname ?? '')) {
           router.push('/login');
         }
       }
