@@ -8,9 +8,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
   const router = useRouter();
+  const { accessToken } = useAuth();
 
   const steps = [
     {
@@ -57,6 +59,17 @@ export default function Home() {
         <Button size={'lg'} variant={'default'} onClick={() => router.push('/auth')} className="mt-8 transition-all duration-200 hover:scale-105 hover:shadow-lg">
           Quero minha avaliação gratuita
         </Button>
+
+        {accessToken && (
+            <Button
+              size="lg"
+              variant="secondary"
+              onClick={() => router.push('/dashboard')}
+              className="transition-all duration-200 hover:scale-105 hover:shadow-lg"
+            >
+              Ir para meus agentes
+            </Button>
+          )}
       </header>
 
       <section className="max-w-6xl mx-auto mb-10">

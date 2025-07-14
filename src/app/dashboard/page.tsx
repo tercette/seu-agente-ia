@@ -47,6 +47,15 @@ export default function DashboardLista() {
         Olá, {userName}! Seus agentes
       </h1>
 
+      <div className="mb-8 flex justify-center">
+        <button
+          onClick={() => router.push('/')}
+          className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded"
+        >
+          Voltar para Home
+        </button>
+      </div>
+
       {agentes.length === 0 ? (
         <div className="flex flex-col items-center gap-4">
           <p className="text-lg text-slate-300">
