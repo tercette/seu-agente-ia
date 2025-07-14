@@ -1,75 +1,72 @@
-import { NextRequest, NextResponse } from 'next/server'
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import { connectMongo } from '@/lib/mongoose'
-import User from '@/models/User'
-import Avaliacao from '@/models/Avaliacao'
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { connectMongo } from "@/lib/mongoose";
+import User from "@/models/User";
+import Avaliacao from "@/models/Avaliacao";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret'
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret'
+const JWT_SECRET = process.env.JWT_SECRET || "your-default-secret";
+const JWT_REFRESH_SECRET =
+  process.env.JWT_REFRESH_SECRET || "your-refresh-secret";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json()
+    const { email, password } = await req.json();
 
     if (!email || !password) {
-      return NextResponse.json({ error: 'Email e senha são obrigatórios' }, { status: 400 })
+      return NextResponse.json(
+        { error: "Email e senha são obrigatórios" },
+        { status: 400 }
+      );
     }
 
-    await connectMongo()
+    await connectMongo();
 
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email });
     if (!user) {
-      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
+      return NextResponse.json(
+        { error: "Usuário não encontrado" },
+        { status: 404 }
+      );
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password)
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return NextResponse.json({ error: 'Senha inválida' }, { status: 401 })
+      return NextResponse.json({ error: "Senha inválida" }, { status: 401 });
     }
 
-    const accessToken = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1m' })
-    const refreshToken = jwt.sign({ userId: user._id }, JWT_REFRESH_SECRET, { expiresIn: '7d' })
+    const accessToken = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "1m",
+    });
+    const refreshToken = jwt.sign({ userId: user._id }, JWT_REFRESH_SECRET, {
+      expiresIn: "7d",
+    });
 
-        // Buscar ou criar a avaliação
-    let avaliacao = await Avaliacao.findOne({ userId: user._id }).sort({ createdAt: -1 });
-
-    if (!avaliacao) {
-      // Caso não tenha avaliação, criamos uma avaliação padrão
-      avaliacao = new Avaliacao({
-        userId: user._id,
-        businessName: 'Novo Negócio',
-        description: 'Descrição do negócio',
-        objective: 'Objetivo do negócio',
-        supportContact: 'Contato de Suporte',
-        website: 'https://www.exemplo.com',
-        phoneNumber: '12345678901',
-        openaiResponse: 'Resposta da OpenAI (ainda não gerada)',
-      });
-      await avaliacao.save();
-    }
-
-    const agentId = avaliacao._id.toString();
+    // Buscar ou criar a avaliação
+    const avaliacao = await Avaliacao.findOne({ userId: user._id }).sort({
+      createdAt: -1,
+    });
+    const agentId = avaliacao ? avaliacao._id.toString() : null;
 
     const response = NextResponse.json({
-      message: 'Login bem-sucedido',
+      message: "Login bem-sucedido",
       accessToken,
       agentId,
       userId: user._id.toString(),
       userName: user.name,
     });
 
-    response.cookies.set('refreshToken', refreshToken, {
+    response.cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60, // 7 dias
-    })
+    });
 
-    return response
+    return response;
   } catch (error) {
-    console.error('[LOGIN_ERROR]', error)
-    return NextResponse.json({ error: 'Erro no login' }, { status: 500 })
+    console.error("[LOGIN_ERROR]", error);
+    return NextResponse.json({ error: "Erro no login" }, { status: 500 });
   }
 }

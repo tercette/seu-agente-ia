@@ -37,8 +37,11 @@ export default function LoginPage() {
         setAgentId(data.agentId); // Atualiza o Agent ID
         setUserName(data.userName)
 
-        // Redireciona o usuário após o login bem-sucedido
-        router.push(`/dashboard/${data.userId}`);
+        if (data.agentId) {
+          router.push(`/dashboard`);
+        } else {
+          router.push('/auth');   // 👈 sem agente → formulário
+        }
       } else {
         setError(data.error || 'Erro ao fazer login');
       }

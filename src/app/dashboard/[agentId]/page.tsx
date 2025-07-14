@@ -41,7 +41,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white px-6 py-10 flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-extrabold mb-6">Bem-vindo ao Dashboard, {userName}!</h1>
+      <h1 className="text-4xl font-extrabold mb-6">Bem-vindo ao Dashboard</h1>
 
       {error && <p className="text-red-500 text-lg mb-4">{error}</p>}
 
