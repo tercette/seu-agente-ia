@@ -8,6 +8,7 @@ interface Avaliacao extends Document {
   supportContact: string;
   website: string;
   phoneNumber: string;
+  openaiResponse?: string;
 }
 
 // Criar o Schema
@@ -49,6 +50,10 @@ const avaliacaoSchema = new Schema<Avaliacao>({
         "Telefone inválido, insira um número válido sem espaços ou caracteres especiais",
     },
   },
+  openaiResponse: {  // Novo campo para armazenar a resposta da OpenAI
+    type: String,
+    required: false,  // Não é obrigatório
+  }
 });
 
 // Criar o modelo baseado no schema

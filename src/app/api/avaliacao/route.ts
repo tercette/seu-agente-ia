@@ -12,13 +12,17 @@ export async function POST(req: NextRequest) {
   try {
     // 1. Obter os dados enviados na requisição
     const data = await req.json();
+    console.log("Dados recebidos:", data); // Logar os dados recebidos
 
     // 2. Conectar ao MongoDB
     await connectMongo();
+    console.log("Conexão com MongoDB bem-sucedida");
 
     // 3. Criar a avaliação no banco de dados
     const avaliacao = new Avaliacao(data);
+    console.log("Avaliacao criada:", avaliacao); // Logar a avaliação antes de salvar
     await avaliacao.save();
+    console.log("Avaliação salva no banco");
 
     // 4. Criar o prompt com base nos dados do formulário
     const openaiPrompt = `
@@ -32,42 +36,27 @@ export async function POST(req: NextRequest) {
       Telefone: ${data.phoneNumber}
     
       Com essas informações, o agente de IA será desenvolvido para atender às necessidades específicas do negócio, com funcionalidades poderosas que vão além de um simples chatbot. Este agente será altamente inteligente, capaz de manter conversas naturais e interagir de forma mais envolvente e personalizada com os clientes, de maneira que não pareça um robô convencional de WhatsApp.
-
-      Aqui estão as capacidades que o agente terá:
-
-      1. **Respostas Naturais e Interativas**: 
-         O agente não apenas responderá como um robô, mas sim como um assistente natural e envolvente, utilizando mensagens de texto ou até áudio, para oferecer uma experiência fluída e personalizada.
-
-      2. **Agendamento Automático**:
-         O agente terá a capacidade de **agendar reuniões** ou **horários** automaticamente via WhatsApp, sem necessidade de intervenção humana. Ele poderá gerenciar agendas, marcar compromissos e manter a interação com o cliente o mais eficiente possível.
-
-      3. **Lembretes Inteligentes**:
-         O agente enviará **mensagens automáticas** para lembrar os clientes sobre reuniões ou compromissos. Além disso, com base nas interações anteriores, a IA vai **avaliar o contexto** e lembrar o cliente sobre algo importante de forma inteligente e personalizada.
-
-      4. **Aprendizado e Adaptação Contínuos**:
-         Com o tempo, o agente se tornará ainda mais inteligente à medida que interage com os clientes. Ele avaliará o contexto do perfil de cada cliente e usará essas informações para tornar a experiência mais assertiva, oferecendo respostas mais personalizadas e ajudando a melhorar a conversão de leads e o atendimento geral.
-
-      5. **Experiência Personalizada**:
-         Cada interação será única, com o agente levando em consideração as especificidades do perfil do cliente, como preferências e histórico de interações. Isso permitirá uma personalização verdadeira, fazendo com que cada cliente sinta que está sendo tratado de forma única.
-
-      O objetivo deste agente de IA não é apenas automatizar o atendimento, mas transformar a experiência do cliente, oferecendo um atendimento eficiente e altamente personalizado. O cliente vai sentir que está interagindo com um assistente que realmente entende suas necessidades e sabe como ajudá-lo da melhor maneira.
-
-      Além disso, com a assinatura do produto, o cliente poderá personalizar ainda mais o agente, configurar interações de acordo com suas necessidades específicas e integrar o agente com seus sistemas e plataformas já existentes, como CRM, WhatsApp, e-mail e o próprio website.
-
-      O que você acha dessas capacidades para o seu novo agente de IA? Como acha que isso pode transformar seu atendimento ao cliente e otimizar sua operação?
+      
+      ... (restante do prompt)
     `;
+
+    console.log("Prompt gerado para a OpenAI:", openaiPrompt); // Logar o prompt que será enviado para a OpenAI
 
     // 5. Chamar a API da OpenAI para gerar uma resposta
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: openaiPrompt }],
     });
+    console.log("Resposta da OpenAI:", response); // Logar a resposta recebida da OpenAI
 
     const message = response.choices[0].message.content;
+    console.log("Resposta gerada pela OpenAI:", message); // Logar a resposta gerada pela OpenAI
 
     // 6. Salvar a avaliação e a resposta gerada no banco de dados
     avaliacao.openaiResponse = message; // Salvar a resposta gerada no campo openaiResponse
+    console.log("Atualizando a avaliação com a resposta da OpenAI:", avaliacao); // Logar antes de salvar
     await avaliacao.save();
+    console.log("Resposta da OpenAI salva no banco de dados");
 
     // 7. Retornar a resposta para o cliente com os dados gerados pela OpenAI
     return NextResponse.json({

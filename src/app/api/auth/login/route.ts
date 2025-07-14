@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { connectMongo } from '@/lib/mongoose'
 import User from '@/models/User'
+import Avaliacao from '@/models/Avaliacao'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret'
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret'
@@ -30,7 +31,11 @@ export async function POST(req: NextRequest) {
     const accessToken = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1m' })
     const refreshToken = jwt.sign({ userId: user._id }, JWT_REFRESH_SECRET, { expiresIn: '7d' })
 
-    const response = NextResponse.json({ message: 'Login bem-sucedido', accessToken })
+    // Buscar o último agentId relacionado ao usuário
+    const avaliacao = await Avaliacao.findOne({ userId: user._id }).sort({ createdAt: -1 }) // Busca a última avaliação
+    const agentId = avaliacao ? avaliacao._id.toString() : null
+
+    const response = NextResponse.json({ message: 'Login bem-sucedido', accessToken, agentId })
 
     response.cookies.set('refreshToken', refreshToken, {
       httpOnly: true,

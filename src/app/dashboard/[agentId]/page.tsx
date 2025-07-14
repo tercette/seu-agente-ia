@@ -5,22 +5,26 @@ import { useParams, useRouter } from 'next/navigation';
 
 export default function Dashboard() {
   const params = useParams();
-  const agentId = params?.agentId; // Verifica se existe o 'agentId' nos params
+  const agentId = params?.agentId; // Pega o agentId da URL
   const [agentData, setAgentData] = useState<any>(null); // Para armazenar os dados do agente
   const [error, setError] = useState('');
   const router = useRouter();
 
   useEffect(() => {
-    if (!agentId) return; // Verifica se o agentId existe antes de fazer a requisição
+    const agentId = localStorage.getItem('agentId');
+    if (!agentId) {
+      setError('Agente não encontrado');
+      return;
+    }
 
-    // Fetching the agent data
+    // Buscando os dados do agente
     const fetchAgentData = async () => {
       try {
         const res = await fetch(`/api/generate-agent/${agentId}`);
         const data = await res.json();
 
         if (res.ok) {
-          setAgentData(data.agentData);
+          setAgentData(data.agentData);  // Defina os dados do agente
         } else {
           setError(data.error || 'Erro ao buscar agente.');
         }
@@ -45,12 +49,22 @@ export default function Dashboard() {
           </p>
           <div className="bg-slate-600 p-6 rounded-lg w-full max-w-xl shadow-md">
             <h2 className="text-xl font-semibold mb-4">Recomendações para o Agente</h2>
-            <p className="text-slate-300">{agentData.openaiResponse}</p>
+            <p className="text-slate-300">{agentData.openaiResponse}</p>  {/* Exibindo a resposta da OpenAI */}
           </div>
 
           <div className="mt-6 bg-slate-600 p-6 rounded-lg w-full max-w-xl shadow-md">
             <h2 className="text-xl font-semibold mb-4">Descrição do Negócio</h2>
-            <p className="text-slate-300">{agentData.description}</p>
+            <p className="text-slate-300">{agentData.description}</p>  {/* Exibindo a descrição */}
+          </div>
+
+          {/* Adicionando mais detalhes, caso necessário */}
+          <div className="mt-6 bg-slate-600 p-6 rounded-lg w-full max-w-xl shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Detalhes do Agente</h2>
+            <p className="text-slate-300"><strong>Nome do Negócio:</strong> {agentData.businessName}</p>
+            <p className="text-slate-300"><strong>Objetivo:</strong> {agentData.objective}</p>
+            <p className="text-slate-300"><strong>Contato de Suporte:</strong> {agentData.supportContact}</p>
+            <p className="text-slate-300"><strong>Website:</strong> <a href={agentData.website} target="_blank" rel="noopener noreferrer">{agentData.website}</a></p>
+            <p className="text-slate-300"><strong>Telefone:</strong> {agentData.phoneNumber}</p>
           </div>
         </>
       ) : (

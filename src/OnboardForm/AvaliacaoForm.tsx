@@ -37,6 +37,8 @@ export default function AvaliacaoPage() {
       if (res.ok) {
         setMessage('Avaliação enviada com sucesso!');
         setOpenaiResponse(responseData.openaiResponse);
+
+        localStorage.setItem('agentId', responseData.agentId);
         
         setTimeout(() => router.push(`/dashboard/${responseData.agentId}`), 1500);
       } else {
