@@ -1,14 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from './context/AuthContext';
+import { Button } from './components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+
 
 export default function Home() {
   const router = useRouter();

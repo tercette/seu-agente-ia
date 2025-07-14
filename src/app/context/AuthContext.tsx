@@ -1,6 +1,7 @@
 // src/context/AuthContext.tsx
 import { useRouter } from 'next/navigation'
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 
 interface AuthContextType {
   accessToken: string
@@ -24,6 +25,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [agentId, setAgentId] = useState<string | null>(null)
   const [userName, setUserName] = useState<string | null>(null)
   const router = useRouter()
+  const pathname = usePathname();
+  const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
 
   // 🔹 Verificação inicial de token ao carregar a aplicação
   useEffect(() => {
@@ -31,7 +34,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const storedToken = localStorage.getItem('accessToken');
         if (!storedToken) {
-          router.push('/login');
+          if (!publicRoutes.includes(pathname)) {
+            router.push('/login');
+          }
           return;
         }
 
@@ -51,16 +56,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setAgentId(data.agentId);
           setUserName(data.userName)
         } else {
-          router.push('/login');
+          if (!publicRoutes.includes(pathname)) {
+            router.push('/login');
+          }
         }
       } catch (error) {
         console.error('Erro ao validar o token inicial:', error);
-        router.push('/login');
+        if (!publicRoutes.includes(pathname)) {
+          router.push('/login');
+        }
       }
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, pathname]);
 
   // Função de auto refresh de token
   useEffect(() => {
@@ -80,17 +89,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setAccessToken(data.accessToken);
             localStorage.setItem('accessToken', data.accessToken);
           } else if (res.status === 401) {
-            router.push('/login'); // Redireciona para o login se não conseguir renovar o token
+            if (!publicRoutes.includes(pathname)) {
+              router.push('/login');
+            }
           }
         }
       } catch (error) {
         console.error('Erro ao renovar o token:', error);
-        router.push('/login');
+        if (!publicRoutes.includes(pathname)) {
+          router.push('/login');
+        }
       }
     }, 55 * 1000); // Renovação a cada 55 segundos
 
     return () => clearInterval(interval);
-  }, [router]);
+  }, [router, pathname]);
 
   return (
     <AuthContext.Provider value={{ accessToken, setAccessToken, userId, setUserId, setAgentId, userName, setUserName }}>
