@@ -151,7 +151,7 @@ export default function AvaliacaoPage() {
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md mt-4"
         >
-          Enviar Avaliação
+          Enviar Avaliação e criar o seu agente de inteligência artificial
         </button>
       </form>
 

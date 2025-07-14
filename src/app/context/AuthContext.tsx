@@ -52,6 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (res.ok && data.accessToken) {
           setAccessToken(data.accessToken);
           localStorage.setItem('accessToken', data.accessToken);
+          setUserName(data.userName);
           setUserId(data.userId);
           setAgentId(data.agentId);
           setUserName(data.userName)

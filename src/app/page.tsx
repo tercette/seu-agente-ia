@@ -4,11 +4,23 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from './context/AuthContext';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+import { Power } from 'lucide-react';
+import { LogoutIconButton } from './components/ui/logoutButton';
 
 
 export default function Home() {
   const router = useRouter();
-  const { accessToken } = useAuth();
+  const { accessToken, userName, setAccessToken, setUserId, setAgentId, setUserName } = useAuth();
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    setAccessToken('');
+    setUserId(null);
+    setAgentId(null);
+    setUserName(null);
+    router.push('/login');
+  };
+
 
   const steps = [
     {
@@ -45,27 +57,40 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white px-4 py-4">
-      <header className="text-center mb-10">
-        <h1 className="text-4xl md:text-5xl font-extrabold">
-          Crie seu Agente de IA Personalizado
-        </h1>
-        <p className="text-lg md:text-xl text-slate-300 mt-4 max-w-2xl mx-auto">
-          Automatize atendimentos, agendamentos e dúvidas com um agente inteligente treinado para o seu negócio.
-        </p>
-        <Button size={'lg'} variant={'default'} onClick={() => router.push('/auth')} className="mt-8 transition-all duration-200 hover:scale-105 hover:shadow-lg">
-          Quero minha avaliação gratuita
-        </Button>
+      <header className="mb-10">
+        {accessToken && userName && (
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 px-2">
+            <p className="text-md text-slate-300">
+              Olá, <span className="font-semibold text-white">{userName}</span>
+            </p>
+            <LogoutIconButton onClick={handleLogout} />
+          </div>
+        )}
 
-        {accessToken && (
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() => router.push('/dashboard')}
-              className="transition-all duration-200 hover:scale-105 hover:shadow-lg"
-            >
-              Ir para meus agentes
+        <div className="text-center">
+          <h1 className="text-4xl md:text-5xl font-extrabold">
+            Crie seu Agente de IA Personalizado
+          </h1>
+          <p className="text-lg md:text-xl text-slate-300 mt-4 max-w-2xl mx-auto">
+            Automatize atendimentos, agendamentos e dúvidas com um agente inteligente treinado para o seu negócio.
+          </p>
+
+          <div className="flex flex-col md:flex-row gap-4 justify-center mt-8">
+            <Button size="lg" variant="default" onClick={() => router.push('/auth')} className="hover:scale-105 hover:shadow-lg">
+              Crie seu agente de inteligência artificial
             </Button>
-          )}
+            {accessToken && (
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={() => router.push('/dashboard')}
+                className="hover:scale-105 hover:shadow-lg"
+              >
+                Ir para meus agentes
+              </Button>
+            )}
+          </div>
+        </div>
       </header>
 
       <section className="max-w-6xl mx-auto mb-10">

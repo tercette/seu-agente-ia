@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function ResetPassword() {
     const [password, setPassword] = useState('')
@@ -7,8 +9,9 @@ export default function ResetPassword() {
     const [message, setMessage] = useState('')
     const [error, setError] = useState('')
     const router = useRouter()
+    const searchParams = useSearchParams();
 
-    const { token } = router.query
+    const token = searchParams.get('token');
 
     useEffect(() => {
         if (token === undefined) return // ainda carregando
@@ -38,6 +41,9 @@ export default function ResetPassword() {
         if (res.ok) {
             setMessage(data.message)
             setError('')
+            setTimeout(() => {
+                router.push('/login');
+            }, 2000);
         } else {
             setError(data.error)
             setMessage('')
