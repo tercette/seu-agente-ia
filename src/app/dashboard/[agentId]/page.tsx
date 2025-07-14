@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Dashboard() {
   const params = useParams();
@@ -10,25 +11,27 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  useEffect(() => {
-    const agentId = localStorage.getItem('agentId');
-    if (!agentId) {
-      setError('Agente não encontrado');
+  const { userName } = useAuth();
+  
+
+    useEffect(() => {
+    if (!agentId || typeof agentId !== 'string') {
+      setError('Agente não encontrado na URL');
       return;
     }
 
-    // Buscando os dados do agente
     const fetchAgentData = async () => {
       try {
         const res = await fetch(`/api/generate-agent/${agentId}`);
         const data = await res.json();
 
         if (res.ok) {
-          setAgentData(data.agentData);  // Defina os dados do agente
+          setAgentData(data.agentData);
         } else {
           setError(data.error || 'Erro ao buscar agente.');
         }
       } catch (err) {
+        console.error('[Dashboard] Erro na requisição:', err);
         setError('Erro interno ao buscar agente.');
       }
     };
@@ -38,7 +41,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white px-6 py-10 flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-extrabold mb-6">Bem-vindo ao Dashboard</h1>
+      <h1 className="text-4xl font-extrabold mb-6">Bem-vindo ao Dashboard, {userName}!</h1>
 
       {error && <p className="text-red-500 text-lg mb-4">{error}</p>}
 

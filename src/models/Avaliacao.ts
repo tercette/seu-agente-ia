@@ -1,7 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-// Definir a interface para a Avaliação
+// Interface
 interface Avaliacao extends Document {
+  userId: mongoose.Types.ObjectId;
   businessName: string;
   description: string;
   objective: string;
@@ -11,52 +12,59 @@ interface Avaliacao extends Document {
   openaiResponse?: string;
 }
 
-// Criar o Schema
-const avaliacaoSchema = new Schema<Avaliacao>({
-  businessName: {
-    type: String,
-    required: [true, "Nome do Negócio é obrigatório"],
-  },
-  description: {
-    type: String,
-    required: [true, "O que sua empresa faz? é obrigatório"],
-  },
-  objective: {
-    type: String,
-    required: [true, "Qual seu principal objetivo? é obrigatório"],
-  },
-  supportContact: {
-    type: String,
-    required: [true, "Contato de Suporte é obrigatório"],
-  },
-  website: {
-    type: String,
-    required: [true, "Website é obrigatório"],
-    validate: {
-      validator: function (v: string) {
-        return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/.test(v);
+// Schema
+const avaliacaoSchema = new Schema<Avaliacao>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    businessName: {
+      type: String,
+      required: [true, "Nome do Negócio é obrigatório"],
+    },
+    description: {
+      type: String,
+      required: [true, "O que sua empresa faz? é obrigatório"],
+    },
+    objective: {
+      type: String,
+      required: [true, "Qual seu principal objetivo? é obrigatório"],
+    },
+    supportContact: {
+      type: String,
+      required: [true, "Contato de Suporte é obrigatório"],
+    },
+    website: {
+      type: String,
+      required: [true, "Website é obrigatório"],
+      validate: {
+        validator: (v: string) =>
+          /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/.test(v),
+        message: "URL inválida",
       },
-      message: "URL inválida",
+    },
+    phoneNumber: {
+      type: String,
+      required: [true, "Telefone é obrigatório"],
+      validate: {
+        validator: (v: string) => /^\d{11}$/.test(v),
+        message:
+          "Telefone inválido, insira um número válido sem espaços ou caracteres especiais",
+      },
+    },
+    openaiResponse: {
+      type: String,
+      required: false,
     },
   },
-  phoneNumber: {
-    type: String,
-    required: [true, "Telefone é obrigatório"],
-    validate: {
-      validator: function (v: string) {
-        return /^\d{11}$/.test(v);
-      },
-      message:
-        "Telefone inválido, insira um número válido sem espaços ou caracteres especiais",
-    },
-  },
-  openaiResponse: {  // Novo campo para armazenar a resposta da OpenAI
-    type: String,
-    required: false,  // Não é obrigatório
+  {
+    timestamps: true, // para .sort({ createdAt: -1 })
   }
-});
+);
 
-// Criar o modelo baseado no schema
+// Model
 const AvaliacaoModel =
   mongoose.models.Avaliacao ||
   mongoose.model<Avaliacao>("Avaliacao", avaliacaoSchema);

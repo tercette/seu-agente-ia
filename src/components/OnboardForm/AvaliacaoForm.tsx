@@ -5,12 +5,25 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { avaliacaoSchema } from './avaliacaoSchema';
+import { jwtDecode } from 'jwt-decode';
+
 
 export default function AvaliacaoPage() {
   const router = useRouter();
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [openaiResponse, setOpenaiResponse] = useState('');
+
+  const isTokenExpired = (token: string): boolean => {
+    try {
+      const decoded: any = jwtDecode(token); // Decodifica o JWT
+      const currentTime = Date.now() / 1000; // Tempo atual em segundos
+      return decoded.exp < currentTime; // Se a expiração for menor que o tempo atual, o token expirou
+    } catch (error) {
+      console.error('Erro ao decodificar o token:', error);
+      return true; // Se não for possível decodificar, consideramos que expirou
+    }
+  };
 
   const {
     register,
@@ -20,15 +33,32 @@ export default function AvaliacaoPage() {
     resolver: zodResolver(avaliacaoSchema),
   });
 
-  const onSubmit = async (data: any) => {
+    const onSubmit = async (data: any) => {
     setMessage('');
     setError('');
     setOpenaiResponse(''); // Limpar resposta anterior
 
+    // Verificar se o token está presente e válido
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      setError('Token de autenticação não encontrado.');
+      router.push('/login');
+      return;
+    }
+
+    if (isTokenExpired(accessToken)) {
+      setError('Sessão expirada. Faça login novamente.');
+      router.push('/login'); // Redireciona para o login se o token expirou
+      return;
+    }
+
     try {
       const res = await fetch('/api/avaliacao', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
         body: JSON.stringify(data),
       });
 
@@ -39,7 +69,7 @@ export default function AvaliacaoPage() {
         setOpenaiResponse(responseData.openaiResponse);
 
         localStorage.setItem('agentId', responseData.agentId);
-        
+
         setTimeout(() => router.push(`/dashboard/${responseData.agentId}`), 1500);
       } else {
         setError(responseData.error || 'Erro ao enviar avaliação.');

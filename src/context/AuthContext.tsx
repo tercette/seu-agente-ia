@@ -8,10 +8,12 @@ interface AuthContextType {
   userId: string | null
   setUserId: (userId: string | null) => void;
   setAgentId: (agentId: string | null) => void
+  setUserName: (userName: string | null) => void
+  userName: string | null;
 }
 
 interface AuthProviderProps {
-  children: React.ReactNode 
+  children: React.ReactNode
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -20,33 +22,78 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string>('')
   const [userId, setUserId] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null)
+  const [userName, setUserName] = useState<string | null>(null)
   const router = useRouter()
 
-  // Função de auto refresh de token
-useEffect(() => {
-    const interval = setInterval(async () => {
+  // 🔹 Verificação inicial de token ao carregar a aplicação
+  useEffect(() => {
+    const checkAuth = async () => {
       try {
-        const res = await fetch('/api/auth/refresh', { method: 'POST' })
-        const data = await res.json()
+        const storedToken = localStorage.getItem('accessToken');
+        if (!storedToken) {
+          router.push('/login');
+          return;
+        }
+
+        const res = await fetch('/api/auth/refresh', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+
+        const data = await res.json();
 
         if (res.ok && data.accessToken) {
-          setAccessToken(data.accessToken) // Atualiza o token
-        } else if (res.status === 401) {
-          // Se a resposta for 401, o token está expirado ou inválido, redireciona para o login
-          router.push('/login') // Redireciona para a página de login
+          setAccessToken(data.accessToken);
+          localStorage.setItem('accessToken', data.accessToken);
+          setUserId(data.userId);
+          setAgentId(data.agentId);
+          setUserName(data.userName)
+        } else {
+          router.push('/login');
         }
       } catch (error) {
-        console.error('Erro ao renovar o token:', error)
-        // Se ocorrer erro no fetch, também redireciona para o login
-        router.push('/login')
+        console.error('Erro ao validar o token inicial:', error);
+        router.push('/login');
       }
-    }, 55 * 1000) // Renovação a cada 55 segundos
+    };
 
-    return () => clearInterval(interval)
-  }, [router])
+    checkAuth();
+  }, [router]);
+
+  // Função de auto refresh de token
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const storedToken = localStorage.getItem('accessToken');
+        if (storedToken) {
+          const res = await fetch('/api/auth/refresh', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${storedToken}`,
+            },
+          });
+          const data = await res.json();
+
+          if (res.ok && data.accessToken) {
+            setAccessToken(data.accessToken);
+            localStorage.setItem('accessToken', data.accessToken);
+          } else if (res.status === 401) {
+            router.push('/login'); // Redireciona para o login se não conseguir renovar o token
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao renovar o token:', error);
+        router.push('/login');
+      }
+    }, 55 * 1000); // Renovação a cada 55 segundos
+
+    return () => clearInterval(interval);
+  }, [router]);
 
   return (
-    <AuthContext.Provider value={{ accessToken, setAccessToken, userId, setUserId, setAgentId }}>
+    <AuthContext.Provider value={{ accessToken, setAccessToken, userId, setUserId, setAgentId, userName, setUserName }}>
       {children}
     </AuthContext.Provider>
   )

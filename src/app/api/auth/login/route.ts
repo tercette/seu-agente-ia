@@ -31,11 +31,33 @@ export async function POST(req: NextRequest) {
     const accessToken = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1m' })
     const refreshToken = jwt.sign({ userId: user._id }, JWT_REFRESH_SECRET, { expiresIn: '7d' })
 
-    // Buscar o último agentId relacionado ao usuário
-    const avaliacao = await Avaliacao.findOne({ userId: user._id }).sort({ createdAt: -1 }) // Busca a última avaliação
-    const agentId = avaliacao ? avaliacao._id.toString() : null
+        // Buscar ou criar a avaliação
+    let avaliacao = await Avaliacao.findOne({ userId: user._id }).sort({ createdAt: -1 });
 
-    const response = NextResponse.json({ message: 'Login bem-sucedido', accessToken, agentId })
+    if (!avaliacao) {
+      // Caso não tenha avaliação, criamos uma avaliação padrão
+      avaliacao = new Avaliacao({
+        userId: user._id,
+        businessName: 'Novo Negócio',
+        description: 'Descrição do negócio',
+        objective: 'Objetivo do negócio',
+        supportContact: 'Contato de Suporte',
+        website: 'https://www.exemplo.com',
+        phoneNumber: '12345678901',
+        openaiResponse: 'Resposta da OpenAI (ainda não gerada)',
+      });
+      await avaliacao.save();
+    }
+
+    const agentId = avaliacao._id.toString();
+
+    const response = NextResponse.json({
+      message: 'Login bem-sucedido',
+      accessToken,
+      agentId,
+      userId: user._id.toString(),
+      userName: user.name,
+    });
 
     response.cookies.set('refreshToken', refreshToken, {
       httpOnly: true,

@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
-  const { setAccessToken, setUserId, setAgentId } = useAuth()
+  const { setAccessToken, setUserId, setAgentId, setUserName } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +35,7 @@ export default function LoginPage() {
         setAccessToken(data.accessToken);
         setUserId(data.userId); // Armazena o userId no contexto
         setAgentId(data.agentId); // Atualiza o Agent ID
+        setUserName(data.userName)
 
         // Redireciona o usuário após o login bem-sucedido
         router.push(`/dashboard/${data.userId}`);

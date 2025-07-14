@@ -1,4 +1,4 @@
-import AuthForm from "@/OnboardForm/AvaliacaoForm";
+import AuthForm from "@/components/OnboardForm/AvaliacaoForm";
 
 
 export default function AuthPage() {
