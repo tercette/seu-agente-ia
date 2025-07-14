@@ -11,10 +11,12 @@ interface AgentLite {
 }
 
 export default function DashboardLista() {
-  const { accessToken, userName } = useAuth();
+  const { accessToken } = useAuth();
+  const [userName, setUserName] = useState('');
   const [agentes, setAgentes] = useState<AgentLite[]>([]);
   const [erro, setErro] = useState('');
   const router = useRouter();
+  
 
   useEffect(() => {
     if (!accessToken) return;
@@ -25,8 +27,12 @@ export default function DashboardLista() {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const data = await res.json();
-        if (res.ok) setAgentes(data.agentes);
-        else setErro(data.error || 'Erro ao buscar agentes');
+        if (res.ok) {
+      setAgentes(data.agentes);
+      setUserName(data.userName);   // exiba onde quiser
+    } else {
+      setErro(data.error);
+    }
       } catch {
         setErro('Falha de rede ao buscar agentes');
       }

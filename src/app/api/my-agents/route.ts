@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectMongo } from "@/lib/mongoose";
 import Avaliacao from "@/models/Avaliacao";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import User from '@/models/User'; 
 
 interface MyPayload extends JwtPayload {
   userId: string;
@@ -20,7 +21,13 @@ export async function GET(req: NextRequest) {
 
     const agentes = await Avaliacao.find({ userId }).sort({ createdAt: -1 });
 
-    return NextResponse.json({ agentes });
+    const usuario = await User.findById(userId).select('name');
+
+     return NextResponse.json({
+      userName: usuario?.name || '',
+      agentes,
+    });
+    
   } catch (err) {
     console.error("[MY_AGENTS]", err);
     return NextResponse.json(
