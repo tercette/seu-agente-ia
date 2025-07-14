@@ -1,0 +1,68 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+
+export default function Dashboard() {
+  const params = useParams();
+  const agentId = params?.agentId; // Verifica se existe o 'agentId' nos params
+  const [agentData, setAgentData] = useState<any>(null); // Para armazenar os dados do agente
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!agentId) return; // Verifica se o agentId existe antes de fazer a requisição
+
+    // Fetching the agent data
+    const fetchAgentData = async () => {
+      try {
+        const res = await fetch(`/api/generate-agent/${agentId}`);
+        const data = await res.json();
+
+        if (res.ok) {
+          setAgentData(data.agentData);
+        } else {
+          setError(data.error || 'Erro ao buscar agente.');
+        }
+      } catch (err) {
+        setError('Erro interno ao buscar agente.');
+      }
+    };
+
+    fetchAgentData();
+  }, [agentId]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white px-6 py-10 flex flex-col items-center justify-center">
+      <h1 className="text-4xl font-extrabold mb-6">Bem-vindo ao Dashboard</h1>
+
+      {error && <p className="text-red-500 text-lg mb-4">{error}</p>}
+
+      {agentData ? (
+        <>
+          <p className="text-lg text-slate-300 mb-4">
+            Seu agente de IA foi criado com sucesso! Veja as informações e recomendações abaixo:
+          </p>
+          <div className="bg-slate-600 p-6 rounded-lg w-full max-w-xl shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Recomendações para o Agente</h2>
+            <p className="text-slate-300">{agentData.openaiResponse}</p>
+          </div>
+
+          <div className="mt-6 bg-slate-600 p-6 rounded-lg w-full max-w-xl shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Descrição do Negócio</h2>
+            <p className="text-slate-300">{agentData.description}</p>
+          </div>
+        </>
+      ) : (
+        <p className="text-lg text-slate-300 mb-4">Carregando o agente...</p>
+      )}
+
+      <button
+        onClick={() => router.push('/')}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md mt-4"
+      >
+        Voltar para a Página Inicial
+      </button>
+    </div>
+  );
+}

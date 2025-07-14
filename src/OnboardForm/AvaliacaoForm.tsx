@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { avaliacaoSchema } from './avaliacaoSchema';
+
 export default function AvaliacaoPage() {
   const router = useRouter();
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [openaiResponse, setOpenaiResponse] = useState('');
 
   const {
     register,
@@ -21,6 +23,7 @@ export default function AvaliacaoPage() {
   const onSubmit = async (data: any) => {
     setMessage('');
     setError('');
+    setOpenaiResponse(''); // Limpar resposta anterior
 
     try {
       const res = await fetch('/api/avaliacao', {
@@ -33,7 +36,9 @@ export default function AvaliacaoPage() {
 
       if (res.ok) {
         setMessage('Avaliação enviada com sucesso!');
-        setTimeout(() => router.push('/dashboard'), 1500);
+        setOpenaiResponse(responseData.openaiResponse);
+        
+        setTimeout(() => router.push(`/dashboard/${responseData.agentId}`), 1500);
       } else {
         setError(responseData.error || 'Erro ao enviar avaliação.');
       }
