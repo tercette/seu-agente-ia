@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 interface AgentLite {
   _id: string;
@@ -16,37 +17,45 @@ export default function DashboardLista() {
   const [agentes, setAgentes] = useState<AgentLite[]>([]);
   const [erro, setErro] = useState('');
   const router = useRouter();
-  
+  const fetchedRef = useRef(false);
+
 
   useEffect(() => {
-    if (!accessToken) return;
+    if (!accessToken || fetchedRef.current) return;
 
-    (async () => {
+    fetchedRef.current = true; // Marca que já fez o fetch
+
+    const fetchAgentes = async () => {
       try {
         const res = await fetch('/api/my-agents', {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const data = await res.json();
+
         if (res.ok) {
-      setAgentes(data.agentes);
-      setUserName(data.userName);   // exiba onde quiser
-    } else {
-      setErro(data.error);
-    }
+          setAgentes(data.agentes);
+          setUserName(data.userName);
+        } else {
+          setErro(data.error);
+        }
       } catch {
         setErro('Falha de rede ao buscar agentes');
       }
-    })();
+    };
+
+    fetchAgentes();
   }, [accessToken]);
 
-  if (erro) {
+  if (!erro && agentes.length === 0 && !fetchedRef.current) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        {erro}
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+        <ClipLoader color="#3b82f6" size={50} />
+        <p className="text-slate-300 text-lg mt-4">Guenta aí...</p>
       </div>
     );
   }
 
+  // ✅ Página carregada normalmente
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white px-6 py-10">
       <h1 className="text-4xl font-extrabold mb-8 text-center">
