@@ -68,7 +68,7 @@ export default function DashboardLista() {
             Você ainda não possui nenhum agente.
           </p>
           <button
-            onClick={() => router.push('/formulario-agente')}
+            onClick={() => router.push('/auth')}
             className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
           >
             Criar agente agora
