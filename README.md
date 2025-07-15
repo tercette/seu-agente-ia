@@ -41,7 +41,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## acessar https://developers.facebook.com/apps/2377734792623250/whatsapp-business/wa-dev-console/?business_id=3579894848720863
 
-## e atualizar https://2f455dabbb97.ngrok-free.app/api/whatsapp/webhook
+## e atualizar https://novoTokenUrlDoNgrok.ngrok-free.app/api/whatsapp/webhook
 
 ## todo
 
