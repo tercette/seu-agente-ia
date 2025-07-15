@@ -4,13 +4,16 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from './context/AuthContext';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
-import { Power } from 'lucide-react';
+import { MessageCircle, Power } from 'lucide-react';
 import { LogoutIconButton } from './components/ui/logoutButton';
+import { useEffect, useRef, useState } from 'react';
 
 
 export default function Home() {
   const router = useRouter();
   const { accessToken, userName, setAccessToken, setUserId, setAgentId, setUserName } = useAuth();
+  const [hasNewMessage, setHasNewMessage] = useState(false);
+  const lastMessageIdRef = useRef<string | null>(null);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
@@ -54,6 +57,29 @@ export default function Home() {
       description: 'Recolha dados, qualifique leads e envie respostas imediatas.',
     },
   ];
+
+  useEffect(() => {
+    const checkNewMessages = async () => {
+      try {
+        const res = await fetch('/api/messages');
+        const data = await res.json();
+
+        if (data.length > 0) {
+          const last = data[0]; // mensagens estão ordenadas por createdAt desc no backend
+          if (lastMessageIdRef.current && last._id !== lastMessageIdRef.current) {
+            setHasNewMessage(true);
+          }
+          lastMessageIdRef.current = last._id;
+        }
+      } catch (err) {
+        console.error('Erro ao verificar novas mensagens:', err);
+      }
+    };
+
+    checkNewMessages();
+    const interval = setInterval(checkNewMessages, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white px-4 py-4">
@@ -141,6 +167,20 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <div className="fixed bottom-4 right-4 z-50 flex justify-end items-end">
+        <Button
+          onClick={() => {
+            setHasNewMessage(false);
+            router.push('/whatsapp');
+          }}
+          className="bg-green-500 hover:bg-green-600 text-white rounded-full w-10 h-10 shadow-lg flex items-center justify-center relative"
+        >
+          <MessageCircle className="w-8 h-8" />
+          {hasNewMessage && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white" />
+          )}
+        </Button>
+      </div>
     </main>
   );
 }

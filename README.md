@@ -37,11 +37,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## to run ngrok =>   ngrok http 3000
 
-## apos a conexao com o ngrok, gerar um novo token atualizar a url do ngrok aqui: https://2f455dabbb97.ngrok-free.app/api/whatsapp/webhook
+## apos a conexao com o ngrok, gerar um novo token atualizar a url do ngrok aqui: https://bee86aeaa94d.ngrok-free.app/api/whatsapp/webhook
 
-## acessar https://developers.facebook.com/apps/2377734792623250/whatsapp-business/wa-dev-console/?business_id=3579894848720863
+## acessar https://developers.facebook.com/apps/2377734792623250/whatsapp-business/wa-settings/?business_id=3579894848720863
+## const VERIFY_TOKEN = "agentGPT123";
 
-## e atualizar https://novoTokenUrlDoNgrok.ngrok-free.app/api/whatsapp/webhook
+## e atualizar 
+
+## pegar o token atualizar o .env e rodar novamente
 
 ## todo
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { AuthProvider } from './context/AuthContext';
+import { UnreadProvider } from './context/UnreadContext';
 import './globals.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -8,9 +9,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className="h-full">
       <body >
         <AuthProvider>
-          {children}
+          <UnreadProvider>
+            {children}
+          </UnreadProvider>
         </AuthProvider>
-        
+
       </body>
     </html>
   );
