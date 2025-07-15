@@ -77,13 +77,19 @@ export default function WhatsAppMessagesPage() {
     }, [messages, selectedPhone]);
 
     useEffect(() => {
-        if (selectedPhone) {
+        if (!selectedPhone || messages.length === 0) return;
+
+        const latestMsg = messages
+            .filter((msg) => msg.phone === selectedPhone)
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+        if (latestMsg?.role === 'user') {
             setUnreadByPhone((prev) => ({
                 ...prev,
                 [selectedPhone]: false,
             }));
         }
-    }, [selectedPhone]);
+    }, [selectedPhone, JSON.stringify(messages)]);
 
     const contacts = Array.from(
         new Map(
