@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectMongo } from "@/lib/mongoose";
-import Avaliacao from "@/models/Avaliacao";
 import { OpenAI } from "openai";
+import Agent from "@/models/Agent";
 
 // Instância do OpenAI com a chave de API diretamente
 const openai = new OpenAI({
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     await connectMongo();
 
     // Criar uma nova avaliação
-    const avaliacao = new Avaliacao(data);
+    const avaliacao = new Agent(data);
 
     // Criar o prompt com base nos dados do formulário
     const openaiPrompt = `

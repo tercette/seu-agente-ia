@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectMongo } from "@/lib/mongoose";
-import Avaliacao from "@/models/Avaliacao";
+import Agent from "@/models/Agent";
 import { OpenAI } from "openai";
 import jwt from "jsonwebtoken";
 
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     console.log("User ID extraído do token:", userId);
 
     // 3. Criar a avaliação com userId
-    const avaliacao = new Avaliacao({
+    const avaliacao = new Agent({
       ...data,
       userId,
     });

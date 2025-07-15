@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { connectMongo } from "@/lib/mongoose";
 import User from "@/models/User";
-import Avaliacao from "@/models/Avaliacao";
+import Agent from "@/models/Agent";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-default-secret";
 const JWT_REFRESH_SECRET =
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Buscar ou criar a avaliação
-    const avaliacao = await Avaliacao.findOne({ userId: user._id }).sort({
+    const avaliacao = await Agent.findOne({ userId: user._id }).sort({
       createdAt: -1,
     });
     const agentId = avaliacao ? avaliacao._id.toString() : null;

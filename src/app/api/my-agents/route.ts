@@ -1,9 +1,9 @@
 // src/app/api/my-agents/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { connectMongo } from "@/lib/mongoose";
-import Avaliacao from "@/models/Avaliacao";
+import Agent from "@/models/Agent";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import User from '@/models/User'; 
+import User from "@/models/User";
 
 interface MyPayload extends JwtPayload {
   userId: string;
@@ -19,15 +19,14 @@ export async function GET(req: NextRequest) {
     const userId = decoded.userId; // agora o TS reconhece
     await connectMongo();
 
-    const agentes = await Avaliacao.find({ userId }).sort({ createdAt: -1 });
+    const agentes = await Agent.find({ userId }).sort({ createdAt: -1 });
 
-    const usuario = await User.findById(userId).select('name');
+    const usuario = await User.findById(userId).select("name");
 
-     return NextResponse.json({
-      userName: usuario?.name || '',
+    return NextResponse.json({
+      userName: usuario?.name || "",
       agentes,
     });
-    
   } catch (err) {
     console.error("[MY_AGENTS]", err);
     return NextResponse.json(
