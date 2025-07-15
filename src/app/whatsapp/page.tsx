@@ -33,32 +33,33 @@ export default function WhatsAppMessagesPage() {
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        const latestByPhone = new Map<string, Message>();
+useEffect(() => {
+  const latestUserMessages: Record<string, Message> = {};
 
-        messages.forEach((msg) => {
-            const existing = latestByPhone.get(msg.phone);
-            if (!existing || new Date(msg.createdAt) > new Date(existing.createdAt)) {
-                latestByPhone.set(msg.phone, msg);
-            }
-        });
+  messages.forEach((msg) => {
+    if (msg.role !== 'user') return;
 
-        setUnreadByPhone((prev) => {
-            const updated = { ...prev };
+    const existing = latestUserMessages[msg.phone];
+    if (!existing || new Date(msg.createdAt) > new Date(existing.createdAt)) {
+      latestUserMessages[msg.phone] = msg;
+    }
+  });
 
-            for (const [phone, lastMsg] of latestByPhone.entries()) {
-                const isUnread =
-                    lastMsg.role === 'user' &&
-                    phone !== selectedPhone;
+  setUnreadByPhone((prev) => {
+    const updated = { ...prev };
 
-                if (isUnread && !updated[phone]) {
-                    updated[phone] = true;
-                }
-            }
+    for (const phone in latestUserMessages) {
+      const lastUserMsg = latestUserMessages[phone];
 
-            return updated;
-        });
-    }, [messages, selectedPhone]);
+      if (phone !== selectedPhone && !prev[phone]) {
+        updated[phone] = true;
+      }
+    }
+
+    return updated;
+  });
+}, [JSON.stringify(messages), selectedPhone]);
+
 
     useEffect(() => {
         if (!selectedPhone) return;
@@ -77,19 +78,13 @@ export default function WhatsAppMessagesPage() {
     }, [messages, selectedPhone]);
 
     useEffect(() => {
-        if (!selectedPhone || messages.length === 0) return;
-
-        const latestMsg = messages
-            .filter((msg) => msg.phone === selectedPhone)
-            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-
-        if (latestMsg?.role === 'user') {
+        if (selectedPhone) {
             setUnreadByPhone((prev) => ({
                 ...prev,
                 [selectedPhone]: false,
             }));
         }
-    }, [selectedPhone, JSON.stringify(messages)]);
+    }, [selectedPhone]);
 
     const contacts = Array.from(
         new Map(
