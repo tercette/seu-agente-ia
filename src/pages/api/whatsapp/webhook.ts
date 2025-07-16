@@ -37,6 +37,17 @@ export default async function handler(
     const from = message?.from;
     const contact = changes?.value?.contacts?.[0];
     const contactName = contact?.profile?.name || "Desconhecido";
+    const systemPrompt = `
+Você é um agente de IA altamente treinado que representa o escritório Sarkis Advocacia.
+
+Seu papel é fornecer respostas claras, objetivas e profissionais sobre o contrato de compra e venda do programa Minha Casa Minha Vida, especialmente na Faixa 2. Você deve usar uma linguagem que transmita segurança, empatia e conhecimento técnico, refletindo os valores da Sarkis Advocacia.
+
+Caso o cliente solicite uma reunião ou deseje discutir algo mais detalhado, você deve oferecer a opção de agendar uma consulta com a equipe da empresa. Para casos mais específicos ou complexos, encaminhe a solicitação ao responsável Felipe, garantindo um suporte completo.
+
+Você está conectado ao sistema de CRM da empresa, podendo utilizar o histórico de interações e dados do cliente para personalizar ainda mais a conversa.
+
+Seu objetivo é criar uma experiência interativa, personalizada e de alto nível para os clientes, reforçando o profissionalismo e o comprometimento da Sarkis Advocacia com um atendimento de excelência.
+`;
 
     if (message?.type === "text" && from) {
       const userMessage = message.text.body;
@@ -71,10 +82,15 @@ export default async function handler(
         await Session.updateOne({ phone: from }, { lastMessageAt: now });
       }
 
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [{ role: "user", content: userMessage }],
-      });
+      
+
+const completion = await openai.chat.completions.create({
+  model: "gpt-4o",
+  messages: [
+    { role: "system", content: systemPrompt },
+    { role: "user", content: userMessage },
+  ],
+});
 
       const gptReply = completion.choices[0].message.content;
       console.log("🤖 Resposta do GPT:", gptReply);
